@@ -2,49 +2,67 @@
     "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+
+        "service-name": {
+            "type": "string",
+            "defaultValue": "szkolachmuryandbol"
+        },
+        "environment": {
+            "type": "string",
+            "defaultValue": "test"
+        },
         "mainName": {
             "type": "string",
-            "defaultValue": "test-szkolachmury-"
+            "defaultValue": "[concat(parameters('service-name'), '-', parameters('environment'))]"
         },
+
         "vnetName": {
             "type": "string",
-            "defaultValue": "[concat(parameters('mainName'), '-vnet')]"
+            "defaultValue": "[concat(parameters('service-name'), '-vnet')]"
         },
 
         "subnet1Name" :{
             "type": "string",
-            "defaultValue": "[concat(parameters('mainName'), '-subnet-1')]"
+            "defaultValue": "[concat(parameters('vnetName'), '-subnet1')]"
         },
         "subnet1Prefix" :{
             "type": "string",
             "defaultValue": "10.0.0.0/24"
         },
+        "subnet1nsgName":{
+            "type": "string",
+            "defaultValue": "[concat(parameters('vnetName'), '-subnet-nsg1')]"
+        },
 
         "subnet2Name" :{
             "type": "string",
-            "defaultValue": "[concat(parameters('mainName'), '-subnet-2')]"
+            "defaultValue": "[concat(parameters('vnetName'), '-subnet2')]"
         },
         "subnet2Prefix" :{
             "type": "string",
             "defaultValue": "10.0.1.0/24"
         },
+        "subnet2nsgName":{
+            "type": "string",
+            "defaultValue": "[concat(parameters('vnetName'), '-subnet-nsg2')]"
+        },
 
         "vm1Name" :{
             "type": "string",
-            "defaultValue": "[concat(parameters('mainName'), '-vm-1')]"
+            "defaultValue": "[concat(parameters('service-name'), '-test-vm1')]"
         },
         "vm1DnsName": {
             "type": "string",
-            "defaultValue": "[concat('dns-',parameters('mainName'), '-vm-1')]"
+            "defaultValue": "[concat('dns-',parameters('service-name'), '-test-vm1')]"
         },
 
         "vm2Name" :{
             "type": "string",
-            "defaultValue": "[concat(parameters('mainName'), '-vm-2')]"
+            "defaultValue": "[concat(parameters('service-name'), '-test-vm2')]"
         },        
         "vm2DnsName": {
             "type": "string",
-            "defaultValue": "[concat('dns-',parameters('mainName'), '-vm-2')]"
+            "defaultValue": "[concat('dns-',parameters('service-name'), '-test-vm2')]"
         },
 
         "adminUsername": {
@@ -61,7 +79,7 @@
     },
     "resources": [
         {
-                   "name": "vnetCreate",
+                   "name": "vnet",
                    "type": "Microsoft.Resources/deployments",
                    "apiVersion": "2017-05-10",
                    "properties": {
@@ -71,25 +89,82 @@
                         "contentVersion":"1.0.0.0"
                      },
                      "parameters": {
-                        "vnetName":{"value": "[parameters('vnetName')]"},
-                        "subnet1Name":{ "value" : "[parameters('subnet1Name')]"},
-                        "subnet1Prefix":{ "value" : "[parameters('subnet1Prefix')]"},
-                        "subnet2Name":{ "value" : "[parameters('subnet2Name')]"},
-                        "subnet2Prefix":{ "value" : "[parameters('subnet2Prefix')]"}
+                        "vnetName":{"value": "[parameters('vnetName')]"}
                       }
                    }
         },
         {
-            "name": "[parameters('vm2Name')]",
+                   "name": "subnet1",
+                   "type": "Microsoft.Resources/deployments",
+                   "apiVersion": "2017-05-10",
+                   "dependsOn" : [
+                       "vnet"
+                   ],
+                   "properties": {
+                     "mode": "Incremental",
+                     "templateLink": {
+                        "uri":"https://raw.githubusercontent.com/b-y-t-e/azure-arm-zadanie3/master/subnet.json",
+                        "contentVersion":"1.0.0.0"
+                     },
+                     "parameters": {
+                        "vnetName":{"value": "[parameters('vnetName')]"},
+                        "subnetName":{ "value" : "[parameters('subnet1Name')]"},
+                        "subnetPrefix":{ "value" : "[parameters('subnet1Prefix')]"}
+                      }
+                   }
+        },
+        {
+                   "name": "subnet2",
+                   "type": "Microsoft.Resources/deployments",
+                   "apiVersion": "2017-05-10",
+                   "dependsOn" : [
+                       "vnet"
+                   ],
+                   "properties": {
+                     "mode": "Incremental",
+                     "templateLink": {
+                        "uri":"https://raw.githubusercontent.com/b-y-t-e/azure-arm-zadanie3/master/subnet.json",
+                        "contentVersion":"1.0.0.0"
+                     },
+                     "parameters": {
+                        "vnetName":{"value": "[parameters('vnetName')]"},
+                        "subnetName":{ "value" : "[parameters('subnet2Name')]"},
+                        "subnetPrefix":{ "value" : "[parameters('subnet2Prefix')]"}
+                      }
+                   }
+        },
+        {
+            "name": "vm1",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "dependsOn" : [
-                "vnetCreate"
+                "vnet",
+                "subnet1"
             ],
-            "copy":{
-               "name"  : "vmCopy",
-               "count" : 2
-            },
+            "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                 "uri":"https://raw.githubusercontent.com/b-y-t-e/azure-arm-zadanie3/master/vm.json",
+                 "contentVersion":"1.0.0.0"
+              },
+              "parameters": {
+                "vmName" : {  "value" : "[parameters('vm1Name')]"},
+                "vnet" : {  "value" : "[parameters('vnetName')]"},
+                "subnetName" : {  "value" : "[parameters('subnet1Name')]"},
+                "dnsLabelPrefix":{"value": "[parameters('vm1DnsName')]"},
+                "adminUsername":{"value": "[parameters('adminUsername')]"},
+                "adminPassword":{"value": "[parameters('adminPassword')]"}
+               }
+            }
+        },
+        {
+            "name": "vm2",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "dependsOn" : [
+                "vnet",
+                "subnet2"
+            ],
             "properties": {
               "mode": "Incremental",
               "templateLink": {
@@ -100,12 +175,56 @@
                 "vmName" : {  "value" : "[parameters('vm2Name')]"},
                 "vnet" : {  "value" : "[parameters('vnetName')]"},
                 "subnetName" : {  "value" : "[parameters('subnet2Name')]"},
-                 "adminUsername":{"value": "[parameters('adminUsername')]"},
-                 "adminPassword":{"value": "[parameters('adminPassword')]"},
-                 "dnsLabelPrefix":{"value": "[parameters('vm2DnsName')]"}
+                "dnsLabelPrefix":{"value": "[parameters('vm2DnsName')]"},
+                "adminUsername":{"value": "[parameters('adminUsername')]"},
+                "adminPassword":{"value": "[parameters('adminPassword')]"}
                }
             }
- }
+        },
+        {
+            "name": "nsg1",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "dependsOn" : [
+                "vnet",
+                "vm1"
+            ],
+            "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                 "uri":"https://raw.githubusercontent.com/b-y-t-e/azure-arm-zadanie3/master/nsg.json",
+                 "contentVersion":"1.0.0.0"
+              },
+              "parameters": {
+                "virtualNetworkName" :  {  "value" : "[parameters('vnetName')]"},
+                "subnetName" : {  "value" : "[parameters('subnet1Name')]"},
+                "subnetPrefixAddress" :{"value": "[parameters('subnet1Prefix')]"},
+                "nsg-name":{"value": "[parameters('subnet1nsgName')]"}
+               }
+            }
+        },
+        {
+            "name": "nsg2",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "dependsOn" : [
+                "vnet",
+                "vm2"
+            ],
+            "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                 "uri":"https://raw.githubusercontent.com/b-y-t-e/azure-arm-zadanie3/master/nsg.json",
+                 "contentVersion":"1.0.0.0"
+              },
+              "parameters": {
+                "virtualNetworkName" :  {  "value" : "[parameters('vnetName')]"},
+                "subnetName" : {  "value" : "[parameters('subnet2Name')]"},
+                "subnetPrefixAddress" :{"value": "[parameters('subnet2Prefix')]"},
+                "nsg-name":{"value": "[parameters('subnet2nsgName')]"}
+               }
+            }
+        }
     ],
     "outputs": {}
 }
