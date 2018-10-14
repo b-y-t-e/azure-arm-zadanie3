@@ -1,6 +1,6 @@
-# Deploying resources with Azure Resource Manager - Homework
+# Deploying resources with Azure Resource Manager
 
-Zadanie 3.1 - Konwencja nazewnicza
+#Zadanie 3.1 - Konwencja nazewnicza
 
 Grupa zasobów
 <service-short-name>-<environment>-rg<number>
@@ -39,7 +39,7 @@ service-short-name - skrócona nazwa usługi
 role - przeznaczenie np. grafiki, dane
 number - numer dysku
 
-Część 2 - ARM Template
+#Zadanie 3.2 - ARM Template
 Skrypt tworzący całość to zadanie3.json, korzysta on z linked templates:
  + vnet.json
  + subnet.json
