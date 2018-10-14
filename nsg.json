@@ -2,45 +2,34 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
     "contentVersion": "1.0.0.1",
     "parameters": {
-      "virtualNetworkResourceGroupName": {
-        "type": "string",
-        "metadata": {
-          "description": "The resource group where the existing VNet is located."
-        }
-      },
       "virtualNetworkName": {
         "type": "string",
         "metadata": {
           "description": "The name of the existing VNet"
-        }
+        },
+        "defaultValue": "test-szkolachmury--vnet"
       },
       "subnetName": {
         "type": "string",
-        "defaultValue": "default",
         "metadata": {
-          "description": "The name of the existing subnet."
-        }
+          "description": "The name of the existing subnet in vnet"
+        },
+        "defaultValue": "test-szkolachmury--subnet-1"
       },
-      "_artifactsLocation": {
+      "subnetPrefixAddress": {
         "type": "string",
-        "metadata": {
-          "description": "The base URI where artifacts required by this template are located."
-        },
-        "defaultValue": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-nsg-add-to-existing-subnet/"
+        "defaultValue": "10.0.0.0/24"
       },
-      "_artifactsLocationSasToken": {
-        "type": "securestring",
-        "metadata": {
-          "description": "The sasToken required to access _artifactsLocation."
-        },
-        "defaultValue": ""
+      "nsg-name": {
+        "type": "string",
+        "defaultValue": "test-szkolachmury--nsg-1"
       }
     },
     "variables": {},
     "resources": [
       {
         "type": "Microsoft.Network/networkSecurityGroups",
-        "name": "new-nsg",
+        "name": "[parameters('nsg-name')]",
         "location": "[resourceGroup().location]",
         "apiVersion": "2018-03-01",
         "properties": {
@@ -58,37 +47,48 @@
                 "priority": 100,
                 "direction": "Inbound"
               }
-            }
+            },
+            {
+                "name": "HTTP",
+                "properties": {
+                  "protocol": "Tcp",
+                  "sourcePortRange": "*",
+                  "destinationPortRange": "80",
+                  "sourceAddressPrefix": "*",
+                  "destinationAddressPrefix": "*",
+                  "access": "Allow",
+                  "priority": 101,
+                  "direction": "Inbound"
+                }
+              },
+              {
+                  "name": "HTTPS",
+                  "properties": {
+                    "protocol": "Tcp",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "443",
+                    "sourceAddressPrefix": "*",
+                    "destinationAddressPrefix": "*",
+                    "access": "Allow",
+                    "priority": 102,
+                    "direction": "Inbound"
+                  }
+                }
           ]
         }
       },
       {
-        "apiVersion": "2017-08-01",
-        "name": "deploy",
-        "type": "Microsoft.Resources/deployments",
-        "resourceGroup": "[parameters('virtualNetworkResourceGroupName')]",
+        "apiVersion": "2018-03-01",
+        "type": "Microsoft.Network/virtualNetworks/subnets",
+        "name": "[concat(parameters('virtualNetworkName'), '/', parameters('subnetName'))]",
         "dependsOn": [
-          "new-nsg"
+          "[parameters('nsg-name')]"
         ],
+        "location": "[resourceGroup().location]",
         "properties": {
-          "mode": "Incremental",
-          "templateLink": {
-            "uri": "[concat(parameters('_artifactsLocation'), concat('nested/updateSubnet.json', parameters('_artifactsLocationSasToken')))]",
-            "contentVersion": "1.0.0.0"
-          },
-          "parameters": {
-            "virtualNetworkName": {
-              "value": "[parameters('virtualNetworkName')]"
-            },
-            "subnetName": {
-              "value": "[parameters('subnetName')]"
-            },
-            "subnetAddressPrefix": {
-              "value": "[reference(resourceId(parameters('virtualNetworkResourceGroupName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName')), '2018-03-01').addressPrefix]"
-            },
-            "nsgId": {
-              "value": "[resourceId('Microsoft.Network/networkSecurityGroups', 'new-nsg')]"
-            }
+          "addressPrefix": "[parameters('subnetPrefixAddress')]",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsg-name'))]"
           }
         }
       }
