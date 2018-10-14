@@ -66,11 +66,11 @@ number - numer dysku
 
 Skrypt tworzący całość to zadanie3.json, korzysta on z linked templates:
 
- + vnet.json
+ + vnet.json (tworzy 1 vnet)
  
- + subnet.json
+ + subnet.json (tworzy 1 subnet)
  
- + vm.json
+ + vm.json (tworzy 1 vm ubuntu 18.04 lts)
  
- + nsg.json
+ + nsg.json (tworzy nsg z otwartymi portami 22, 80 i 443)
  
