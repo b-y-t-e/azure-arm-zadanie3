@@ -1,0 +1,108 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "companyName": {
+            "type" : "string"
+        },
+        "serviceName" : {
+            "type"   : "string"
+        },
+        "location": {
+            "type" : "string",
+            "defaultValue": "westeurope"
+        },
+        "ubuntuOSVersion" : {
+            "type": "string",
+            "defaultValue": "16.04.0-LTS"
+        },
+        "galleryName": {
+            "type": "string",
+            "defaultValue": "16.04.0-LTS"
+        },
+        "galleryImageDefinitionName": {
+            "type": "string",
+            "defaultValue": "16.04.0-LTS"
+        },
+        "galleryImageVersionName": {
+            "type": "string",
+            "defaultValue": "16.04.0-LTS"
+        },        
+        "mainName": {
+            "type": "string",
+            "defaultValue": "[concat(parameters('companyName'), '-', parameters('serviceName'))]"
+        },
+        "rgName": {
+            "type": "string",
+            "defaultValue": "[concat(parameters('mainName'), '-rg')]"
+        },
+        "vnetName": {
+            "type": "string",
+            "defaultValue": "[concat(parameters('mainName'), '-vnet')]"
+        },
+        "vmNameBase": {
+            "type": "string",
+            "defaultValue": "[concat(parameters('mainName'), '-vm')]"
+        },
+        "dnsVmNameBase": {
+            "type": "string",
+            "defaultValue": "[concat('dns-',parameters('mainName'), '-vm')]"
+        },
+        "adminUsername": {
+            "type": "string",
+            "defaultValue": "whitebyte"
+        },
+        "adminPassword": {
+            "type": "string",
+            "defaultValue": "Konsolaelse4"
+        }
+    },
+    "variables": {
+        
+    },
+    "resources": [
+        {
+                   "name": "vnetCreate",
+                   "type": "Microsoft.Resources/deployments",
+                   "apiVersion": "2017-05-10",
+                   "properties": {
+                     "mode": "Incremental",
+                     "templateLink": {
+                        "uri":"https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-vnet-two-subnets/azuredeploy.json",
+                        "contentVersion":"1.0.0.0"
+                     },
+                     "parameters": {
+                        "vnetName":{"value": "[parameters('vnetName')]"}
+                      }
+                   }
+        },
+        {
+            "name": "[concat(parameters('vmNameBase'),copyindex())]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "dependsOn" : [
+                "vnetCreate"
+            ],
+            "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                 "uri":"https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-vm-from-sig/azuredeploy.json",
+                 "contentVersion":"1.0.0.0"
+              },
+              "parameters": {
+                 "adminUsername":{"value": "[parameters('adminUsername')]"},
+                 "adminPassword":{"value": "[parameters('adminPassword')]"},
+                 "dnsLabelPrefix":{"value": "[concat(parameters('dnsVmNameBase'),copyindex())]"},
+                 "galleryName":{"value": "[parameters('galleryName')]"},
+                 "galleryImageDefinitionName":{"value": "[parameters('galleryImageDefinitionName')]"},
+                 "galleryImageVersionName":{"value": "[parameters('galleryImageVersionName')]"}
+               }
+            },
+            "copy" : {
+                "name": "ltCreateVmsCopy",
+                "count": 2
+            }
+ }
+    ],
+    "outputs": {}
+}
