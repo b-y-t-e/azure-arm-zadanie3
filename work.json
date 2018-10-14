@@ -10,26 +10,38 @@
             "type": "string",
             "defaultValue": "[concat(parameters('mainName'), '-vnet')]"
         },
+
         "subnet1Name" :{
             "type": "string",
             "defaultValue": "[concat(parameters('mainName'), '-subnet-1')]"
         },
+        "subnet1Prefix" :{
+            "type": "string",
+            "defaultValue": "10.0.0.0/24"
+        },
+
         "subnet2Name" :{
             "type": "string",
             "defaultValue": "[concat(parameters('mainName'), '-subnet-2')]"
         },
+        "subnet2Prefix" :{
+            "type": "string",
+            "defaultValue": "10.0.1.0/24"
+        },
+
         "vm1Name" :{
             "type": "string",
             "defaultValue": "[concat(parameters('mainName'), '-vm-1')]"
-        },
-        "vm2Name" :{
-            "type": "string",
-            "defaultValue": "[concat(parameters('mainName'), '-vm-2')]"
         },
         "vm1DnsName": {
             "type": "string",
             "defaultValue": "[concat('dns-',parameters('mainName'), '-vm-1')]"
         },
+
+        "vm2Name" :{
+            "type": "string",
+            "defaultValue": "[concat(parameters('mainName'), '-vm-2')]"
+        },        
         "vm2DnsName": {
             "type": "string",
             "defaultValue": "[concat('dns-',parameters('mainName'), '-vm-2')]"
@@ -61,7 +73,9 @@
                      "parameters": {
                         "vnetName":{"value": "[parameters('vnetName')]"},
                         "subnet1Name":{ "value" : "[parameters('subnet1Name')]"},
-                        "subnet2Name":{ "value" : "[parameters('subnet2Name')]"}
+                        "subnet1Prefix":{ "value" : "[parameters('subnet1Prefix')]"},
+                        "subnet2Name":{ "value" : "[parameters('subnet2Name')]"},
+                        "subnet2Prefix":{ "value" : "[parameters('subnet2Prefix')]"}
                       }
                    }
         },
@@ -72,6 +86,10 @@
             "dependsOn" : [
                 "vnetCreate"
             ],
+            "copy":{
+               "name"  : "vmCopy",
+               "count" : 2
+            },
             "properties": {
               "mode": "Incremental",
               "templateLink": {
