@@ -3,9 +3,9 @@
 **Zadanie 3.1 - Konwencja nazewnicza**
 
 Grupa zasobów
-
+```
 <service-short-name>-<environment>-rg<number>
- 
+ ```
 service-short-name - skrócona nazwa usługi
 
 environment - skrócona nazwa środowiska (prod, dev, test, staging)
