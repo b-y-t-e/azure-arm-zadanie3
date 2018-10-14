@@ -70,7 +70,7 @@ Skrypt tworzący całość to zadanie3.json, korzysta on z linked templates:
  
  + subnet.json (tworzy 1 subnet)
  
- + vm.json (tworzy 1 vm ubuntu 18.04 lts)
+ + vm.json (tworzy 1 vm ubuntu 18.04 lts na standard b1s)
  
  + nsg.json (tworzy nsg z otwartymi portami 22, 80 i 443)
  
