@@ -34,8 +34,8 @@
         "imagePublisher": "Canonical",
         "imageOffer": "UbuntuServer",
         "ubuntuOSVersion": "18.04",
-        "nicName": "[concat(parameters(vmName), 'nic', uniquestring(resourceGroup().id))]",
-        "publicIPAddressName": "[concat(parameters(vmName), 'publicip', uniquestring(resourceGroup().id))]",
+        "nicName": "[concat(parameters('vmName'), 'nic', uniquestring(resourceGroup().id))]",
+        "publicIPAddressName": "[concat(parameters('vmName'), 'publicip', uniquestring(resourceGroup().id))]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnet'), parameters('subnetName'))]"
     },
     "resources": [
