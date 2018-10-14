@@ -2,52 +2,39 @@
     "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "companyName": {
-            "type" : "string"
-        },
-        "serviceName" : {
-            "type"   : "string"
-        },
-        "location": {
-            "type" : "string",
-            "defaultValue": "westeurope"
-        },
-        "ubuntuOSVersion" : {
-            "type": "string",
-            "defaultValue": "16.04.0-LTS"
-        },
-        "galleryName": {
-            "type": "string",
-            "defaultValue": "16.04.0-LTS"
-        },
-        "galleryImageDefinitionName": {
-            "type": "string",
-            "defaultValue": "16.04.0-LTS"
-        },
-        "galleryImageVersionName": {
-            "type": "string",
-            "defaultValue": "16.04.0-LTS"
-        },        
         "mainName": {
             "type": "string",
-            "defaultValue": "[concat(parameters('companyName'), '-', parameters('serviceName'))]"
-        },
-        "rgName": {
-            "type": "string",
-            "defaultValue": "[concat(parameters('mainName'), '-rg')]"
+            "defaultValue": "test_szkolachmury_"
         },
         "vnetName": {
             "type": "string",
             "defaultValue": "[concat(parameters('mainName'), '-vnet')]"
         },
-        "vmNameBase": {
+        "subnet1Name" :{
             "type": "string",
-            "defaultValue": "[concat(parameters('mainName'), '-vm')]"
+            "defaultValue": "[concat(parameters('mainName'), '-subnet-1')]"
         },
-        "dnsVmNameBase": {
+        "subnet2Name" :{
             "type": "string",
-            "defaultValue": "[concat('dns-',parameters('mainName'), '-vm')]"
+            "defaultValue": "[concat(parameters('mainName'), '-subnet-2')]"
         },
+        "vm1Name" :{
+            "type": "string",
+            "defaultValue": "[concat(parameters('mainName'), '-vm-1')]"
+        },
+        "vm2Name" :{
+            "type": "string",
+            "defaultValue": "[concat(parameters('mainName'), '-vm-2')]"
+        },
+        "vm1DnsName": {
+            "type": "string",
+            "defaultValue": "[concat('dns-',parameters('mainName'), '-vm-1')]"
+        },
+        "vm2DnsName": {
+            "type": "string",
+            "defaultValue": "[concat('dns-',parameters('mainName'), '-vm-2')]"
+        },
+
         "adminUsername": {
             "type": "string",
             "defaultValue": "whitebyte"
@@ -68,16 +55,18 @@
                    "properties": {
                      "mode": "Incremental",
                      "templateLink": {
-                        "uri":"https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-vnet-two-subnets/azuredeploy.json",
+                        "uri":"https://raw.githubusercontent.com/b-y-t-e/azure-arm-zadanie3/master/vnet.json",
                         "contentVersion":"1.0.0.0"
                      },
                      "parameters": {
-                        "vnetName":{"value": "[parameters('vnetName')]"}
+                        "vnetName":{"value": "[parameters('vnetName')]"},
+                        "subnet1Name":{ "value" : "[parameters('subnet1Name')]"},
+                        "subnet2Name":{ "value" : "[parameters('subnet2Name')]"}
                       }
                    }
         },
         {
-            "name": "[concat(parameters('vmNameBase'),copyindex())]",
+            "name": "[parameters('vm2Name')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "dependsOn" : [
@@ -86,21 +75,17 @@
             "properties": {
               "mode": "Incremental",
               "templateLink": {
-                 "uri":"https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-vm-from-sig/azuredeploy.json",
+                 "uri":"https://raw.githubusercontent.com/b-y-t-e/azure-arm-zadanie3/master/vm.json",
                  "contentVersion":"1.0.0.0"
               },
               "parameters": {
+                "vmName" : {  "value" : "[parameters('vm2Name')]"},
+                "vnet" : {  "value" : "[parameters('vnetName')]"},
+                "subnetName" : {  "value" : "[parameters('subnet2Name')]"},
                  "adminUsername":{"value": "[parameters('adminUsername')]"},
                  "adminPassword":{"value": "[parameters('adminPassword')]"},
-                 "dnsLabelPrefix":{"value": "[concat(parameters('dnsVmNameBase'),copyindex())]"},
-                 "galleryName":{"value": "[parameters('galleryName')]"},
-                 "galleryImageDefinitionName":{"value": "[parameters('galleryImageDefinitionName')]"},
-                 "galleryImageVersionName":{"value": "[parameters('galleryImageVersionName')]"}
+                 "dnsLabelPrefix":{"value": "[parameters('vm2DnsName')]"}
                }
-            },
-            "copy" : {
-                "name": "ltCreateVmsCopy",
-                "count": 2
             }
  }
     ],
