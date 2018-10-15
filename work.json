@@ -70,8 +70,8 @@
             "defaultValue": "whitebyte"
         },
         "adminPassword": {
-            "type": "string",
-            "defaultValue": "Konsolaelse4"
+            "type": "securestring",
+            "defaultValue": ""
         }
     },
     "variables": {
