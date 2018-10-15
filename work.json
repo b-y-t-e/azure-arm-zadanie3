@@ -70,8 +70,7 @@
             "defaultValue": "whitebyte"
         },
         "adminPassword": {
-            "type": "securestring",
-            "defaultValue": ""
+            "type": "securestring"
         }
     },
     "variables": {
