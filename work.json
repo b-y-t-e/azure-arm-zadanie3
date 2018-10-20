@@ -4,12 +4,10 @@
     "parameters": {
 
         "service-name": {
-            "type": "string",
-            "defaultValue": "szkolachmuryandbol"
+            "type": "string"
         },
         "environment": {
-            "type": "string",
-            "defaultValue": "test"
+            "type": "string"
         },
         "mainName": {
             "type": "string",
@@ -64,12 +62,10 @@
             "type": "string",
             "defaultValue": "[concat('dns-',parameters('service-name'), '-test-vm2')]"
         },
-
-        "adminUsername": {
-            "type": "string",
-            "defaultValue": "whitebyte"
-        },
         "adminPassword": {
+            "type": "securestring"
+        },
+        "adminUsername": {
             "type": "securestring"
         }
     },

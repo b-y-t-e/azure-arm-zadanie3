@@ -1,0 +1,28 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "service-name":{
+            "value": "szkolachmuryandbol"
+        },
+        "environment":{
+            "value" : "test"
+        },
+      "adminUsername": {
+        "reference": {
+          "keyVault": {
+            "id": "/subscriptions/0d3be028-1443-48cc-861b-c0bc383d2f98/resourceGroups/szkolachmury-keyvaults/providers/Microsoft.KeyVault/vaults/szkolachmury"
+          },
+          "secretName": "adminLogin"
+        }
+      },
+      "adminPassword": {
+        "reference": {
+          "keyVault": {
+            "id": "/subscriptions/0d3be028-1443-48cc-861b-c0bc383d2f98/resourceGroups/szkolachmury-keyvaults/providers/Microsoft.KeyVault/vaults/szkolachmury"
+          },
+          "secretName": "adminPassword"
+        }
+      }
+    }
+  }
