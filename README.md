@@ -64,7 +64,7 @@ number - numer dysku
 
 ## Zadanie 3.2 - ARM Template
 
-Skrypt tworzący całość to zadanie3.json, korzysta on z linked templates:
+Skrypt tworzący całość to work.json, korzysta on z linked templates:
 
  + vnet.json (tworzy 1 vnet)
  
@@ -74,3 +74,12 @@ Skrypt tworzący całość to zadanie3.json, korzysta on z linked templates:
  
  + nsg.json (tworzy nsg z otwartymi portami 22, 80 i 443)
  
+
+## Zadanie 3.3 - Custom rola - RBAC
+
+Pozwala użytkownikowi uruchomić maszynę, zatrzymać ją i zgłosić zgłoszenie do supportu przez Portal Azure”
+Skrypt tworzący to custom.role.json
+
+## Zadanie 3.4 - Połączenie z key vaults
+
+Połączenie odbywa się w pliku z paramtrami 'work.parameters.json', key vault w azure musi mieć włączone ustawienie --enabled-for-template-deployment true
