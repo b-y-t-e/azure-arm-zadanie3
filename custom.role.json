@@ -1,0 +1,29 @@
+{
+    "Name":  "My custom VM operator",
+    "Id":  "9574f3cb-94a0-4b0f-a15e-5e5e2f8103e7    ",
+    "IsCustom":  true,
+    "Description":  "Can start / poweroff / virtual machines and send message to support.",
+    "Actions":  [
+                    "Microsoft.Storage/*/read",
+                    "Microsoft.Network/*/read",
+                    "Microsoft.Compute/*/read",
+                    "Microsoft.Compute/virtualMachines/start/action",
+                    "Microsoft.Compute/virtualMachines/poweroff/action",
+                    "Microsoft.Authorization/*/read",
+                    "Microsoft.Resources/subscriptions/resourceGroups/read",
+                    "Microsoft.Insights/alertRules/*",
+                    "Microsoft.Support/*"
+    ],
+    "NotActions":  [
+  
+                   ],
+    "DataActions":  [
+  
+                    ],
+    "NotDataActions":  [
+  
+                       ],
+    "AssignableScopes":  [
+                             "/subscriptions/{subscriptionId1}"
+                         ]
+  }
